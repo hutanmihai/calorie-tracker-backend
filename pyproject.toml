@@ -129,13 +129,16 @@ required = false
 # This task will create migration
 help = "Create migration"
 cmd = "alembic revision --autogenerate"
+envfile = "envs/local.env"
 
 [tool.poe.tasks.upgrade_schema]
 # This task will upgrade the database schema
 help = "Upgrade database schema"
 cmd = "alembic upgrade head"
+envfile = "envs/local.env"
 
 [tool.poe.tasks.downgrade_schema]
 # This task will upgrade the database schema
 help = "Downgrade database schema"
 cmd = "alembic downgrade head"
+envfile = "envs/local.env"

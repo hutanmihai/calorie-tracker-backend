@@ -2,6 +2,17 @@ from pydantic import BaseSettings, Field, PostgresDsn, validator
 
 
 class AppSettings(BaseSettings):
+    algorithm: str = Field(..., env="ALGORITHM")
+    secret_key: str = Field(..., env="SECRET_KEY")
+    access_token_expires_minutes: int = Field(..., env="ACCESS_TOKEN_EXPIRE_MINUTES")
+
+    google_client_id: str = Field(..., env="GOOGLE_CLIENT_ID")
+    google_client_secret: str = Field(..., env="GOOGLE_CLIENT_SECRET")
+    google_scopes: str = "openid email profile"
+    google_conf_url: str = (
+        "https://accounts.google.com/.well-known/openid-configuration"
+    )
+
     app_host: str = Field(..., env="APP_HOST")
     app_port: str = Field(..., env="APP_PORT")
 
