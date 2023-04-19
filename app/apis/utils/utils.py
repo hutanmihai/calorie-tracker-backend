@@ -5,14 +5,10 @@ from app.apis.schemas.errors_schema import ApiError, AuthError
 
 
 # Function that wraps the error response into predefined schema
-def generate_api_error_response(
-        status_code: int, description: str
-) -> JSONResponse:
+def generate_api_error_response(status_code: int, description: str) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
-        content=ApiError(
-            status_code=status_code, description=description
-        ).dict(),
+        content=ApiError(status_code=status_code, description=description).dict(),
     )
 
 
@@ -32,7 +28,7 @@ def generate_error_responses(*args) -> dict[int, dict[str, str]]:
             description = "Forbidden Error"
             error_responses[status.HTTP_403_FORBIDDEN] = {
                 "detail": description,
-                "model": AuthError
+                "model": AuthError,
             }
 
     return error_responses
