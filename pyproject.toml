@@ -14,6 +14,10 @@ sqlalchemy = { version = "^2.0.5.post1", extras = ["asyncio"] }
 asyncpg = "^0.27.0"
 uvicorn = { version = "^0.20.0", extras = ["standard"] }
 greenlet = "^2.0.2"
+google-auth-oauthlib = "^1.0.0"
+google-auth = "^2.16.3"
+google-auth-httplib2 = "^0.1.0"
+pyjwt = "^2.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -129,13 +133,22 @@ required = false
 # This task will create migration
 help = "Create migration"
 cmd = "alembic revision --autogenerate"
+envfile = "envs/local.env"
 
 [tool.poe.tasks.upgrade_schema]
 # This task will upgrade the database schema
 help = "Upgrade database schema"
 cmd = "alembic upgrade head"
+envfile = "envs/local.env"
 
 [tool.poe.tasks.downgrade_schema]
 # This task will upgrade the database schema
 help = "Downgrade database schema"
 cmd = "alembic downgrade head"
+envfile = "envs/local.env"
+
+[tool.poe.tasks.upgrade_schema_production]
+# This task will upgrade the database schema on production db
+help = "Upgrade database schema on production db"
+cmd = "alembic upgrade head"
+envfile = "envs/prod.env"

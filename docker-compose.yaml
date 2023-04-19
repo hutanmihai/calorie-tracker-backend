@@ -28,7 +28,7 @@ services:
         condition: service_healthy
     env_file:
       - envs/dev.env
-    command: "poetry run poe upgrade_schema"
+    command: "poetry run alembic upgrade head"
 
   app:
     build:

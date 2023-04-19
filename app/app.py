@@ -1,12 +1,28 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run as uvicorn_run
 
 from app.apis.health_api import router as health_router
+from app.apis.login import router as login_router
 from app.settings import settings
 
 
 def _register_api_handlers(app: FastAPI) -> FastAPI:
+    """Register API handlers."""
     app.include_router(health_router)
+    app.include_router(login_router)
+    return app
+
+
+def add_middleware(app: FastAPI) -> FastAPI:
+    """Add middleware to FastAPI application."""
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     return app
 
 
@@ -14,10 +30,11 @@ def create_app() -> FastAPI:
     """Create and return FastAPI application."""
     app = FastAPI()
     app = _register_api_handlers(app)
+    app = add_middleware(app)
     return app
 
 
-app = create_app()
+app: FastAPI = create_app()
 
 
 def run_app(app: FastAPI = app) -> None:

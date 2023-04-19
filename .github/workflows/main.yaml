@@ -47,6 +47,11 @@ jobs:
           pip install -r requirements.txt
       - name: Run tests
         env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ secrets.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRETS }}
           APP_HOST: ${{ secrets.APP_HOST }}
           APP_PORT: ${{ secrets.APP_PORT }}
           DATABASE_HOSTNAME: ${{ secrets.DATABASE_HOSTNAME }}

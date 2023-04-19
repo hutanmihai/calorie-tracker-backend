@@ -1,12 +1,12 @@
 import asyncio
 from logging.config import fileConfig
 
-from app import models
-from app.settings import settings
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from alembic import context
+from app import models
+from app.settings import settings
 
 
 def get_database_url() -> str:
