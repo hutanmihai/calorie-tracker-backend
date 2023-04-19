@@ -10,6 +10,7 @@ from app.auth.jwt_handler import token_encode
 from app.services.errors import UserNotFound
 from app.services.user_srv import UserSrv
 from app.settings import settings
+from app.apis.schemas.jwt_schema import TokenSchema
 
 GOOGLE_CLIENT_ID = settings.google_client_id
 
@@ -20,6 +21,7 @@ router = APIRouter()
     "/login",
     summary="Login with Google",
     status_code=status.HTTP_200_OK,
+    response_model=TokenSchema,
     response_description="Login successful",
     responses=generate_error_responses(
         status.HTTP_400_BAD_REQUEST, status.HTTP_403_FORBIDDEN
@@ -53,7 +55,7 @@ async def login_google(token: str, user_srv: UserSrv = Depends(UserSrv)):
             )
 
         # Return JWT token
-        return token_encode(user.id)
+        return TokenSchema(token=token_encode(user.id))
 
     except ValueError as e:
         return generate_api_error_response(status.HTTP_400_BAD_REQUEST, str(e))
