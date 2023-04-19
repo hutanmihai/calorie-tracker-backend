@@ -23,12 +23,24 @@ async def get_products_data():
         for row in reader:
             product = {
                 "product_name": row["product_name"],
-                "energy_kcal": row["energy-kcal_100g"],
-                "fat": row["fat_100g"],
-                "carbohydrates": row["carbohydrates_100g"],
-                "protein": row["proteins_100g"],
+                "energy_kcal": round(float(row["energy-kcal_100g"]), 2),
+                "fat": round(float(row["fat_100g"]), 2),
+                "carbohydrates": round(float(row["carbohydrates_100g"]), 2),
+                "protein": round(float(row["proteins_100g"]), 2),
                 "downvotes": 0,
             }
+            if (
+                product["fat"] == 0
+                and product["carbohydrates"] == 0
+                and product["protein"] == 0
+            ):
+                continue
+            if product["energy_kcal"] == 0:
+                continue
+            product["product_name"] = product["product_name"].strip().lower()
+            pn = product["product_name"]
+            if pn in ["", "0", 0, "?", ".", "#", "nan", "none", "null", "undefined"]:
+                continue
             products.append(product)
 
     return products

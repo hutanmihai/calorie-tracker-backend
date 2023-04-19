@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: a46166fad623
+Revision ID: e48dc1db189b
 Revises: 831930d8cdbb
-Create Date: 2023-04-19 14:25:12.531125
+Create Date: 2023-04-19 16:38:22.335257
 
 """
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "a46166fad623"
+revision = "e48dc1db189b"
 down_revision = "831930d8cdbb"
 branch_labels = None
 depends_on = None
@@ -22,10 +22,10 @@ def upgrade() -> None:
         "product",
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("product_name", sa.VARCHAR(length=255), nullable=False),
-        sa.Column("energy_kcal", sa.DECIMAL(), nullable=False),
-        sa.Column("fat", sa.DECIMAL(), nullable=False),
-        sa.Column("carbohydrates", sa.DECIMAL(), nullable=False),
-        sa.Column("protein", sa.DECIMAL(), nullable=False),
+        sa.Column("energy_kcal", sa.FLOAT(decimal_return_scale=2), nullable=False),
+        sa.Column("fat", sa.FLOAT(decimal_return_scale=2), nullable=False),
+        sa.Column("carbohydrates", sa.FLOAT(decimal_return_scale=2), nullable=False),
+        sa.Column("protein", sa.FLOAT(decimal_return_scale=2), nullable=False),
         sa.Column("downvotes", sa.INTEGER(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
