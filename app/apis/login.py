@@ -4,13 +4,13 @@ from fastapi import APIRouter, Depends, status
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
+from app.apis.schemas.jwt_schema import TokenSchema
 from app.apis.utils.utils import generate_api_error_response, generate_error_responses
 from app.auth.auth_bearer import auth_required
 from app.auth.jwt_handler import token_encode
 from app.services.errors import UserNotFound
 from app.services.user_srv import UserSrv
 from app.settings import settings
-from app.apis.schemas.jwt_schema import TokenSchema
 
 GOOGLE_CLIENT_ID = settings.google_client_id
 
