@@ -146,3 +146,9 @@ envfile = "envs/local.env"
 help = "Downgrade database schema"
 cmd = "alembic downgrade head"
 envfile = "envs/local.env"
+
+[tool.poe.tasks.upgrade_schema_production]
+# This task will upgrade the database schema on production db
+help = "Upgrade database schema on production db"
+cmd = "alembic upgrade head"
+envfile = "envs/prod.env"
