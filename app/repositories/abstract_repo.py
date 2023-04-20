@@ -21,3 +21,7 @@ class AbstractRepository(abc.ABC):
     @abc.abstractmethod
     async def list(self, model_cls: BaseModel) -> List[BaseModel]:
         raise NotImplementedError
+
+    @abc.abstractmethod
+    async def delete(self, instance: BaseModel) -> None:
+        raise NotImplementedError

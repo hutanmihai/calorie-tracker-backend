@@ -14,7 +14,7 @@ from app.settings import settings
 
 GOOGLE_CLIENT_ID = settings.google_client_id
 
-router = APIRouter()
+router = APIRouter(tags=["auth"])
 
 
 @router.post(

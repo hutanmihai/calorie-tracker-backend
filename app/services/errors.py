@@ -12,3 +12,11 @@ class UserAlreadyExists(BaseUserServiceError):
 
 class UserNotFound(BaseUserServiceError):
     """Raised when a user doesn't exist."""
+
+
+class BaseProductServiceError(BaseServiceError):
+    """Base class for all exceptions raise by Product services"""
+
+
+class ProductNotFound(BaseProductServiceError):
+    """Raised when a product doesn't exist."""

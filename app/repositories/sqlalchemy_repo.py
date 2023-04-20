@@ -44,7 +44,11 @@ class SQLAlchemyRepository(AbstractRepository):
         return instance
 
     async def list(self, model_cls: BaseModel) -> List[BaseModel]:
-        return await self.db_session.scalars(select(model_cls))
+        return await self.db_session.scalars(select(model_cls).limit(100))
+
+    async def delete(self, instance: BaseModel) -> None:
+        await self.db_session.delete(instance)
+        await self.db_session.commit()
 
     @staticmethod
     def _handle_sqlalchemy_error(err: Exception) -> None:
