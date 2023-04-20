@@ -16,31 +16,21 @@ async def get_products_data():
         List of dictionaries for <Product>
     """
     with open(PRODUCTS_PATH, "r", encoding="utf-8") as csv_file:
-        reader = DictReader(csv_file, delimiter="\t")
+        reader = DictReader(csv_file, delimiter=",")
 
         products = []
 
         for row in reader:
             product = {
-                "product_name": row["product_name"],
-                "energy_kcal": round(float(row["energy-kcal_100g"]), 2),
-                "fat": round(float(row["fat_100g"]), 2),
-                "carbohydrates": round(float(row["carbohydrates_100g"]), 2),
-                "protein": round(float(row["proteins_100g"]), 2),
+                "name": row["Food"],
+                "calories": float(row["Calories"]),
+                "fat": float(row["Fat"]),
+                "carbs": float(row["Carbs"]),
+                "protein": float(row["Protein"]),
+                "upvotes": 0,
                 "downvotes": 0,
             }
-            if (
-                product["fat"] == 0
-                and product["carbohydrates"] == 0
-                and product["protein"] == 0
-            ):
-                continue
-            if product["energy_kcal"] == 0:
-                continue
-            product["product_name"] = product["product_name"].strip().lower()
-            pn = product["product_name"]
-            if pn in ["", "0", 0, "?", ".", "#", "nan", "none", "null", "undefined"]:
-                continue
+            product["name"] = product["name"].strip().lower()
             products.append(product)
 
     return products
