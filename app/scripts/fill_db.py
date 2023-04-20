@@ -40,14 +40,13 @@ async def fill_db_with_products():
     """
     Save object into database
 
-    # get all products data
+    # get all products' data
     # save each product
     """
     products = await get_products_data()
 
     async with async_session() as session:
         async with session.begin():
-
             for product in products:
                 prod = Product(**product)
                 session.add(prod)
