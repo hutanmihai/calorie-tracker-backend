@@ -5,6 +5,7 @@ from uvicorn import run as uvicorn_run
 from app.apis.health_api import router as health_router
 from app.apis.login import router as login_router
 from app.apis.product_api import router as product_router
+from app.scripts.create_admin import insert_admin
 from app.settings import settings
 
 
@@ -39,6 +40,12 @@ def create_app() -> FastAPI:
 app: FastAPI = create_app()
 
 
-def run_app(app: FastAPI = app) -> None:
+@app.on_event("startup")
+async def startup_event():
+    """Insert admin on startup."""
+    await insert_admin()
+
+
+async def run_app(app: FastAPI = app) -> None:
     """Run FastAPI application."""
     uvicorn_run(app, host=settings.app_host, port=int(settings.app_port))

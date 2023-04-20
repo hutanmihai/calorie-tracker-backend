@@ -10,6 +10,7 @@ from app.apis.schemas.product import (
     ProductUpdate,
 )
 from app.apis.utils.utils import generate_api_error_response, generate_error_responses
+from app.auth.auth_bearer import admin_required, auth_required
 from app.services.errors import ProductNotFound
 from app.services.product_srv import ProductSrv
 
@@ -22,7 +23,10 @@ router = APIRouter(tags=["product"])
     status_code=status.HTTP_200_OK,
     response_model=ProductBase,
     response_description="Product fetched successfully",
-    responses=generate_error_responses(status.HTTP_404_NOT_FOUND),
+    responses=generate_error_responses(
+        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+    ),
+    dependencies=[Depends(auth_required)],
 )
 async def get_product(
     product_id: UUID, product_srv: ProductSrv = Depends(ProductSrv)
@@ -42,6 +46,8 @@ async def get_product(
     status_code=status.HTTP_200_OK,
     response_model=ProductsList,
     response_description="Products fetched successfully",
+    responses=generate_error_responses(status.HTTP_403_FORBIDDEN),
+    dependencies=[Depends(auth_required)],
 )
 async def list_products(product_srv: ProductSrv = Depends(ProductSrv)) -> ProductsList:
     products = await product_srv.list_products()
@@ -54,6 +60,8 @@ async def list_products(product_srv: ProductSrv = Depends(ProductSrv)) -> Produc
     status_code=status.HTTP_201_CREATED,
     response_model=ProductBase,
     response_description="Product created successfully",
+    responses=generate_error_responses(status.HTTP_403_FORBIDDEN),
+    dependencies=[Depends(auth_required)],
 )
 async def new_product(
     product: ProductCreate, product_srv: ProductSrv = Depends(ProductSrv)
@@ -74,7 +82,10 @@ async def new_product(
     status_code=status.HTTP_200_OK,
     response_model=ProductBase,
     response_description="Product updated successfully",
-    responses=generate_error_responses(status.HTTP_404_NOT_FOUND),
+    responses=generate_error_responses(
+        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+    ),
+    dependencies=[Depends(auth_required)],
 )
 async def update_product(
     product_id: UUID,
@@ -101,10 +112,13 @@ async def update_product(
 
 @router.delete(
     "/product/{product_id}",
-    summary="Delete product",
+    summary="Delete product - ADMIN ONLY",
     status_code=status.HTTP_200_OK,
     response_description="Product deleted successfully",
-    responses=generate_error_responses(status.HTTP_404_NOT_FOUND),
+    responses=generate_error_responses(
+        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+    ),
+    dependencies=[Depends(admin_required)],
 )
 async def delete_product(
     product_id: UUID, product_srv: ProductSrv = Depends(ProductSrv)

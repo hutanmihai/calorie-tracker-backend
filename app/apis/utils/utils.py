@@ -20,10 +20,11 @@ def generate_error_responses(*args) -> dict[int, dict[str, str]]:
             description = "Conflict Error"
         elif arg == status.HTTP_404_NOT_FOUND:
             description = "Not Found Error"
-        error_responses[arg] = {
-            "description": description,
-            "model": ApiError,
-        }
+        if arg != status.HTTP_403_FORBIDDEN:
+            error_responses[arg] = {
+                "description": description,
+                "model": ApiError,
+            }
         if arg == status.HTTP_403_FORBIDDEN:
             description = "Forbidden Error"
             error_responses[status.HTTP_403_FORBIDDEN] = {

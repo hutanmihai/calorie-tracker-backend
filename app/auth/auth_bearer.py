@@ -1,10 +1,13 @@
 from datetime import datetime
+from uuid import UUID
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jwt import PyJWTError
 
 from app.auth.jwt_handler import token_decode
+from app.database import async_session
+from app.models import User
+from app.settings import settings
 
 
 class JWTBearer(HTTPBearer):
@@ -16,22 +19,12 @@ class JWTBearer(HTTPBearer):
             JWTBearer, self
         ).__call__(request)
         if credentials:
-            if not credentials.scheme == "Bearer":
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Invalid authentication scheme.",
-                )
             if not self.verify_jwt(credentials.credentials):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Invalid token or expired token.",
                 )
             return credentials.credentials
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid authorization code.",
-            )
 
     def verify_jwt(self, jwtoken: str) -> bool:
         is_token_valid: bool = False
@@ -39,16 +32,23 @@ class JWTBearer(HTTPBearer):
             payload = token_decode(jwtoken)
         except Exception:
             payload = None
+
         if payload:
-            exp = payload.get("exp")
+            try:
+                exp = payload.get("exp")
+            except Exception:
+                exp = None
+
+            if not exp:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Missing exp in token.",
+                )
+
             is_expired = datetime.utcnow() > datetime.utcfromtimestamp(exp)
 
             if not is_expired:
                 is_token_valid = True
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN, detail="Token has expired."
-                )
 
         return is_token_valid
 
@@ -56,10 +56,40 @@ class JWTBearer(HTTPBearer):
 # Function that gets the user_id from the token after it has been decoded
 async def auth_required(token: str = Depends(JWTBearer())):
     user_id = token_decode(token).get("sub")
-
     if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing user_id in token"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Missing user_id in token."
         )
 
+    try:
+        user_id = UUID(user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid user_id in token."
+        )
+
+    async with async_session() as session:
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="User not found."
+            )
+
     return user_id
+
+
+# Function that gets the admin_id from the token and checks if it is the same as the admin_id in the settings
+async def admin_required(token: str = Depends(JWTBearer())):
+    admin_id = token_decode(token).get("sub")
+
+    if not admin_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Missing sub in token."
+        )
+
+    if admin_id != settings.admin_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not an admin user."
+        )
+
+    return admin_id

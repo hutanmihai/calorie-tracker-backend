@@ -1,12 +1,13 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
 from app.apis.schemas.jwt_schema import TokenSchema
 from app.apis.utils.utils import generate_api_error_response, generate_error_responses
-from app.auth.auth_bearer import auth_required
+from app.auth.auth_bearer import admin_required, auth_required
 from app.auth.jwt_handler import token_encode
 from app.services.errors import UserNotFound
 from app.services.user_srv import UserSrv
@@ -61,9 +62,24 @@ async def login_google(token: str, user_srv: UserSrv = Depends(UserSrv)):
         return generate_api_error_response(status.HTTP_400_BAD_REQUEST, str(e))
 
 
-@router.get("/protected", summary="Protected endpoint test")
-async def protected(
+@router.get("/protected", summary="Protected endpoint for testing purposes")
+async def protected_return(
     user_id: UUID = Depends(auth_required), user_srv: UserSrv = Depends(UserSrv)
 ):
     user = await user_srv.get_user(user_id)
-    return {"message": f"Hello {user.name} from a protected endpoint!"}
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": f"Hello {user.name} from a protected endpoint!"},
+    )
+
+
+@router.get(
+    "/protected-admin",
+    summary="Protected endpoint for testing purposes",
+    dependencies=[Depends(admin_required)],
+)
+async def protected_admin():
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": "Hello ADMIN from a protected endpoint!"},
+    )

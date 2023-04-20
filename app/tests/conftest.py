@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import models
 from app.app import app
 from app.database import async_engine, async_session
+from app.scripts.create_admin import insert_admin
 
 
 @pytest.fixture(scope="session")
@@ -23,6 +24,11 @@ async def db_tables() -> None:
     async with async_engine.begin() as conn:
         await conn.run_sync(models.BaseModel.metadata.drop_all)
         await conn.run_sync(models.BaseModel.metadata.create_all)
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def insert_admin_data() -> None:
+    await insert_admin()
 
 
 @pytest_asyncio.fixture

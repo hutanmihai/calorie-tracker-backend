@@ -1,3 +1,4 @@
+from app.auth.jwt_handler import token_encode
 from app.database import async_session
 from app.models import Product, User
 from app.tests.utils.data_generation_tools import (
@@ -6,13 +7,14 @@ from app.tests.utils.data_generation_tools import (
 )
 
 
-async def new_user() -> User:
+async def new_user() -> (User, str):
     async with async_session() as session:
-        user = get_user_instance()
+        user: User = get_user_instance()
         session.add(user)
         actual_user = await session.get(User, user.id)
         await session.commit()
-        return actual_user
+        token: str = token_encode(actual_user.id)
+        return actual_user, token
 
 
 async def new_product() -> Product:

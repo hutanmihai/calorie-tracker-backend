@@ -5,6 +5,7 @@ from fastapi import status
 from httpx import AsyncClient
 
 from app.models import Product
+from app.settings import settings
 from app.tests.utils.asserts import (
     assert_api_error,
     assert_api_path_param_validation_error,
@@ -17,12 +18,14 @@ from app.tests.utils.data_generation_tools import (
     generate_id,
     get_random_string_of_length_bigger_than_255,
 )
-from app.tests.utils.entity_instance import new_product
+from app.tests.utils.entity_instance import new_product, new_user
 from app.tests.utils.entity_list_instances import get_all_products
 from app.tests.utils.payloads import (
     get_create_product_payload,
     get_update_product_payload,
 )
+
+ADMIN_JWT = settings.admin_token
 
 
 @pytest.mark.asyncio
@@ -34,7 +37,10 @@ async def test_get_product_with_valid_id_successfully_returns_product(
     expected_status_code = status.HTTP_200_OK
     expected_product = new_created_product
 
-    response = await client.get(f"/product/{new_created_product.id}")
+    response = await client.get(
+        f"/product/{new_created_product.id}",
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
+    )
     actual_product = Product(**response.json())
 
     assert response.status_code == expected_status_code
@@ -48,7 +54,9 @@ async def test_get_product_with_invalid_id_returns_error(client: AsyncClient):
     expected_status_code = status.HTTP_404_NOT_FOUND
     expected_description = "Product not found"
 
-    response = await client.get(f"/product/{invalid_id}")
+    response = await client.get(
+        f"/product/{invalid_id}", headers={"Authorization": f"Bearer {ADMIN_JWT}"}
+    )
 
     assert response.status_code == expected_status_code
     assert_api_error(response.json(), expected_status_code, expected_description)
@@ -60,7 +68,9 @@ async def test_get_product_with_invalid_id_type_returns_error(client: AsyncClien
 
     expected_status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    response = await client.get(f"/product/{invalid_id}")
+    response = await client.get(
+        f"/product/{invalid_id}", headers={"Authorization": f"Bearer {ADMIN_JWT}"}
+    )
 
     assert response.status_code == expected_status_code
     assert_api_path_param_validation_error(response.json(), ["product_id"])
@@ -76,7 +86,9 @@ async def test_get_all_products_successfully_returns_all_products(
     expected_status_code = status.HTTP_200_OK
     expected_products = await get_all_products()
 
-    response = await client.get("/products")
+    response = await client.get(
+        "/products", headers={"Authorization": f"Bearer {ADMIN_JWT}"}
+    )
     actual_products = [Product(**product) for product in response.json()["products"]]
 
     assert response.status_code == expected_status_code
@@ -108,7 +120,11 @@ async def test_create_product_with_valid_fields_successfully_creates_product(
         downvotes=0,
     )
 
-    response = await client.post("/product", json=request_payload)
+    response = await client.post(
+        "/product",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
+    )
     actual_product = Product(**response.json())
 
     assert response.status_code == expected_status_code
@@ -129,7 +145,11 @@ async def test_create_product_with_missing_required_args_returns_error(
     expected_status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
     expected_breaking_fields = ["name", "calories", "fat", "carbs", "protein"]
 
-    response = await client.post("/product", json=request_payload)
+    response = await client.post(
+        "/product",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
+    )
 
     assert response.status_code == expected_status_code
     assert_api_validation_error(response.json(), expected_breaking_fields)
@@ -147,7 +167,11 @@ async def test_create_product_with_invalid_name_returns_error(client: AsyncClien
     expected_status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
     expected_breaking_field = "name"
 
-    response = await client.post("/product", json=request_payload)
+    response = await client.post(
+        "/product",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
+    )
 
     assert response.status_code == expected_status_code
     assert_api_validation_error(response.json(), [expected_breaking_field])
@@ -165,7 +189,11 @@ async def test_create_product_with_invalid_types_returns_error(client: AsyncClie
     expected_status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
     expected_breaking_fields = ["name", "calories", "fat", "carbs", "protein"]
 
-    response = await client.post("/product", json=request_payload)
+    response = await client.post(
+        "/product",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
+    )
 
     assert response.status_code == expected_status_code
     assert_api_validation_error(response.json(), expected_breaking_fields)
@@ -198,7 +226,9 @@ async def test_update_product_with_valid_fields_successfully_updates_product(
     expected_product.downvotes = downvotes
 
     response = await client.put(
-        f"/product/{new_created_product.id}", json=request_payload
+        f"/product/{new_created_product.id}",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
     )
 
     actual_product = Product(**response.json())
@@ -232,7 +262,9 @@ async def test_update_product_with_missing_votes_successfully_updates_product(
     expected_product.carbs = carbs
 
     response = await client.put(
-        f"/product/{new_created_product.id}", json=request_payload
+        f"/product/{new_created_product.id}",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
     )
 
     actual_product = Product(**response.json())
@@ -259,7 +291,9 @@ async def test_update_product_with_invalid_name_returns_error(client: AsyncClien
     expected_breaking_field = "name"
 
     response = await client.put(
-        f"/product/{new_created_product.id}", json=request_payload
+        f"/product/{new_created_product.id}",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
     )
 
     assert response.status_code == expected_status_code
@@ -293,7 +327,9 @@ async def test_update_product_with_invalid_args_types_returns_error(
     ]
 
     response = await client.put(
-        f"/product/{new_created_product.id}", json=request_payload
+        f"/product/{new_created_product.id}",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
     )
 
     assert response.status_code == expected_status_code
@@ -319,7 +355,11 @@ async def test_update_product_with_not_existing_product_returns_error(
     expected_status_code = status.HTTP_404_NOT_FOUND
     excpected_description = "Product not found"
 
-    response = await client.put(f"/product/{product_id}", json=request_payload)
+    response = await client.put(
+        f"/product/{product_id}",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
+    )
 
     assert response.status_code == expected_status_code
     assert_api_error(response.json(), expected_status_code, excpected_description)
@@ -333,7 +373,10 @@ async def test_delete_product_with_existing_product_successfully_deletes_product
 
     expected_status_code = status.HTTP_200_OK
 
-    response = await client.delete(f"/product/{new_created_product.id}")
+    response = await client.delete(
+        f"/product/{new_created_product.id}",
+        headers={"Authorization": f"Bearer {ADMIN_JWT}"},
+    )
 
     assert response.status_code == expected_status_code
     assert response.json() == {"message": "Product deleted successfully"}
@@ -348,7 +391,9 @@ async def test_delete_product_with_not_existing_product_returns_error(
     expected_status_code = status.HTTP_404_NOT_FOUND
     excpected_description = "Product not found"
 
-    response = await client.delete(f"/product/{product_id}")
+    response = await client.delete(
+        f"/product/{product_id}", headers={"Authorization": f"Bearer {ADMIN_JWT}"}
+    )
 
     assert response.status_code == expected_status_code
     assert_api_error(response.json(), expected_status_code, excpected_description)

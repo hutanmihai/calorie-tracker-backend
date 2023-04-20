@@ -24,6 +24,10 @@ def assert_api_error(
     assert content["description"] == expected_description
 
 
+def assert_http_exception_error(content: dict, expected_detail: str):
+    assert content["detail"] == expected_detail
+
+
 def assert_base_product_response(actual_product: Product, expected_product: Product):
     assert actual_product.id is not None
     assert actual_product.name == expected_product.name
