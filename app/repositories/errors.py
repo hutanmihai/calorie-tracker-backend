@@ -8,3 +8,7 @@ class EntityNotUnique(BaseRepositoryError):
 
 class EntityNotFound(BaseRepositoryError):
     """Raised when a resource is not found."""
+
+
+class EnumValueInvalid(BaseRepositoryError):
+    """Raised when an enum value is invalid."""
