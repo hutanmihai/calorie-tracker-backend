@@ -32,14 +32,18 @@ async def fill_db_with_admin_data():
 
     async with async_session() as session:
         async with session.begin():
-            user = User(**admin)
-            session.add(user)
+            # Check if admin exists
+            found = await session.get(User, admin["id"])
+            if not found:
+                # If admin does not exist, create it
+                user = User(**admin)
+                session.add(user)
 
-            try:
-                await session.commit()
-            except IntegrityError:
-                await session.rollback()
-                raise IntegrityError
+                try:
+                    await session.commit()
+                except IntegrityError:
+                    await session.rollback()
+                    raise IntegrityError
 
 
 async def insert_admin():
