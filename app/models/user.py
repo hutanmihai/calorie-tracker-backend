@@ -16,7 +16,19 @@ class User(BaseModel):
     email = Column(VARCHAR(255), nullable=False, unique=True)
     name = Column(VARCHAR(255), nullable=False)
     picture = Column(VARCHAR(255), nullable=True)
-    pref_height_metric = Column(ChoiceType(HeightMetric), unique=False, nullable=True)
+    pref_height_metric = Column(
+        ChoiceType(HeightMetric),
+        unique=False,
+        nullable=False,
+        default=HeightMetric.cm,
+        server_default=HeightMetric.cm,
+    )
     height = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=True)
-    pref_weight_metric = Column(ChoiceType(WeightMetric), unique=False, nullable=True)
+    pref_weight_metric = Column(
+        ChoiceType(WeightMetric),
+        unique=False,
+        nullable=False,
+        default=WeightMetric.kg,
+        server_default=WeightMetric.kg,
+    )
     weight = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=True)

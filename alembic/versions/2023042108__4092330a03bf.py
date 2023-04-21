@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: bd95d41525b9
+Revision ID: 4092330a03bf
 Revises: 1458f256cf80
-Create Date: 2023-04-21 16:18:50.148355
+Create Date: 2023-04-21 17:08:36.566635
 
 """
 import sqlalchemy as sa
@@ -12,7 +12,7 @@ from alembic import op
 from app.apis.utils.enums import HeightMetric, WeightMetric
 
 # revision identifiers, used by Alembic.
-revision = "bd95d41525b9"
+revision = "4092330a03bf"
 down_revision = "1458f256cf80"
 branch_labels = None
 depends_on = None
@@ -25,7 +25,8 @@ def upgrade() -> None:
         sa.Column(
             "pref_height_metric",
             sqlalchemy_utils.types.choice.ChoiceType(HeightMetric),
-            nullable=True,
+            server_default="cm",
+            nullable=False,
         ),
     )
     op.add_column(
@@ -36,7 +37,8 @@ def upgrade() -> None:
         sa.Column(
             "pref_weight_metric",
             sqlalchemy_utils.types.choice.ChoiceType(WeightMetric),
-            nullable=True,
+            server_default="kg",
+            nullable=False,
         ),
     )
     op.add_column(

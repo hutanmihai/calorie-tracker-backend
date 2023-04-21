@@ -5,7 +5,7 @@ class HeightMetric(str, Enum):
     """Possible height metrics"""
 
     feet: str = "feet"
-    m: str = "m"
+    cm: str = "cm"
 
 
 class WeightMetric(str, Enum):
