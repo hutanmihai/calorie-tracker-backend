@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import FLOAT, VARCHAR, Column
+from sqlalchemy import FLOAT, INT, VARCHAR, Column
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import ChoiceType
 
@@ -32,3 +32,5 @@ class User(BaseModel):
         server_default=WeightMetric.kg,
     )
     weight = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=True)
+    target_weight = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=True)
+    target_calories = Column(INT(), nullable=True)
