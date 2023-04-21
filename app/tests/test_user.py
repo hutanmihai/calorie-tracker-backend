@@ -1,5 +1,3 @@
-from uuid import UUID
-
 import pytest
 from fastapi import status
 from httpx import AsyncClient
@@ -15,10 +13,7 @@ from app.tests.utils.asserts import (
     assert_id_did_not_change,
     assert_list_all_users_response,
 )
-from app.tests.utils.data_generation_tools import (
-    generate_id,
-    get_random_string_of_length_bigger_than_255,
-)
+from app.tests.utils.data_generation_tools import generate_id
 from app.tests.utils.entity_instance import new_user
 from app.tests.utils.entity_list_instances import get_all_users
 from app.tests.utils.payloads import get_update_user_payload
@@ -105,7 +100,7 @@ async def test_delete_user_with_non_existing_id_returns_not_found_error(
     )
 
     assert response.status_code == expected_status_code
-    assert_api_error(response.json(), expected_status_code, expected_description)
+    assert_api_error(response.json(), expected_description)
 
 
 @pytest.mark.asyncio

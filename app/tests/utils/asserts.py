@@ -17,11 +17,8 @@ def assert_api_path_param_validation_error(
         assert content["detail"][i]["loc"][1] == expected_breaking_fields[i]
 
 
-def assert_api_error(
-    content: dict, expected_status_code: int, expected_description: str
-):
-    assert content["status_code"] == expected_status_code
-    assert content["description"] == expected_description
+def assert_api_error(content: dict, expected_description: str):
+    assert content["detail"] == expected_description
 
 
 def assert_http_exception_error(content: dict, expected_detail: str):
