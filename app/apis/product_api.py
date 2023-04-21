@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
-from app.apis.schemas.product import (
+from app.apis.schemas.product_schema import (
     ProductBase,
     ProductCreate,
     ProductsList,
