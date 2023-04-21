@@ -6,6 +6,12 @@ class AppSettings(BaseSettings):
     secret_key: str = Field(..., env="SECRET_KEY")
     access_token_expires_minutes: int = Field(..., env="ACCESS_TOKEN_EXPIRE_MINUTES")
 
+    admin_token: str = Field(..., env="ADMIN_TOKEN")
+    admin_id: str = Field(..., env="ADMIN_ID")
+    admin_g_id: str = Field(..., env="ADMIN_G_ID")
+    admin_email: str = Field(..., env="ADMIN_EMAIL")
+    admin_name: str = Field(..., env="ADMIN_NAME")
+
     google_client_id: str = Field(..., env="GOOGLE_CLIENT_ID")
     google_client_secret: str = Field(..., env="GOOGLE_CLIENT_SECRET")
     google_scopes: str = "openid email profile"

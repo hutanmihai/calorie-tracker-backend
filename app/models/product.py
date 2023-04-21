@@ -1,0 +1,19 @@
+import uuid
+
+from sqlalchemy import FLOAT, INT, VARCHAR, Column
+from sqlalchemy.dialects.postgresql import UUID
+
+from app.models.base import BaseModel
+
+
+class Product(BaseModel):
+    __tablename__ = "product"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(VARCHAR(255), nullable=False)
+    calories = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=False)
+    fat = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=False)
+    carbs = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=False)
+    protein = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=False)
+    upvotes = Column(INT(), nullable=False)
+    downvotes = Column(INT(), nullable=False)
