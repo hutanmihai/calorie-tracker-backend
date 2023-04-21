@@ -42,12 +42,14 @@ async def get_product(
 
 @router.get(
     "/products",
-    summary="Get all products",
+    summary="Get all products - ADMIN ONLY",
     status_code=status.HTTP_200_OK,
     response_model=ProductsList,
     response_description="Products fetched successfully",
-    responses=generate_error_responses(status.HTTP_403_FORBIDDEN),
-    dependencies=[Depends(auth_required)],
+    responses=generate_error_responses(
+        status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN
+    ),
+    dependencies=[Depends(admin_required)],
 )
 async def list_products(product_srv: ProductSrv = Depends(ProductSrv)) -> ProductsList:
     products = await product_srv.list_products()
@@ -60,7 +62,9 @@ async def list_products(product_srv: ProductSrv = Depends(ProductSrv)) -> Produc
     status_code=status.HTTP_201_CREATED,
     response_model=ProductBase,
     response_description="Product created successfully",
-    responses=generate_error_responses(status.HTTP_403_FORBIDDEN),
+    responses=generate_error_responses(
+        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+    ),
     dependencies=[Depends(auth_required)],
 )
 async def new_product(
@@ -116,7 +120,9 @@ async def update_product(
     status_code=status.HTTP_200_OK,
     response_description="Product deleted successfully",
     responses=generate_error_responses(
-        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+        status.HTTP_404_NOT_FOUND,
+        status.HTTP_401_UNAUTHORIZED,
+        status.HTTP_403_FORBIDDEN,
     ),
     dependencies=[Depends(admin_required)],
 )

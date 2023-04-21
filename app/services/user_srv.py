@@ -5,10 +5,10 @@ from fastapi import Depends
 
 from app.apis.utils.enums import HeightMetric, WeightMetric
 from app.models import User
-from app.repositories.errors import EntityNotFound, EntityNotUnique, EnumValueInvalid
+from app.repositories.errors import EntityNotFound, EntityNotUnique
 from app.repositories.user_repo import UserRepository
 from app.services.abstract_srv import AbstractService
-from app.services.errors import UserAlreadyExists, UserEnumValueInvalid, UserNotFound
+from app.services.errors import UserAlreadyExists, UserNotFound
 
 
 class UserSrv(AbstractService):
@@ -62,10 +62,7 @@ class UserSrv(AbstractService):
         instance.target_weight = target_weight or instance.target_weight
         instance.target_calories = target_calories or instance.target_calories
 
-        try:
-            return await self._repository.update(instance)
-        except EnumValueInvalid:
-            raise UserEnumValueInvalid()
+        return await self._repository.update(instance)
 
     # Get all users
     async def get_all_users(self) -> List[User]:

@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from app.apis.schemas.user_schema import UserBase, UsersList, UserUpdate
 from app.apis.utils.utils import generate_api_error_response, generate_error_responses
 from app.auth.auth_bearer import admin_required, auth_required
-from app.services.errors import UserEnumValueInvalid, UserNotFound
+from app.services.errors import UserNotFound
 from app.services.user_srv import UserSrv
 from app.settings import settings
 
@@ -19,12 +19,17 @@ router = APIRouter(tags=["user"])
     status_code=status.HTTP_200_OK,
     response_model=UserBase,
     response_description="User fetched successfully",
-    responses=generate_error_responses(status.HTTP_403_FORBIDDEN),
+    responses=generate_error_responses(
+        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+    ),
 )
 async def get_current_user(
     user_id: UUID = Depends(auth_required), user_srv: UserSrv = Depends(UserSrv)
 ) -> UserBase | JSONResponse:
-    user = await user_srv.get_user(user_id)
+    try:
+        user = await user_srv.get_user(user_id)
+    except UserNotFound:
+        return generate_api_error_response(status.HTTP_404_NOT_FOUND, "User not found")
     return user
 
 
@@ -34,7 +39,9 @@ async def get_current_user(
     status_code=status.HTTP_200_OK,
     response_model=UsersList,
     response_description="Users fetched successfully",
-    responses=generate_error_responses(status.HTTP_403_FORBIDDEN),
+    responses=generate_error_responses(
+        status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN
+    ),
     dependencies=[Depends(admin_required)],
 )
 async def get_all_users(
@@ -51,7 +58,9 @@ async def get_all_users(
     response_model=UserBase,
     response_description="User updated successfully",
     responses=generate_error_responses(
-        status.HTTP_400_BAD_REQUEST, status.HTTP_403_FORBIDDEN
+        status.HTTP_404_NOT_FOUND,
+        status.HTTP_400_BAD_REQUEST,
+        status.HTTP_403_FORBIDDEN,
     ),
 )
 async def update_user(
@@ -72,10 +81,6 @@ async def update_user(
         )
     except UserNotFound:
         return generate_api_error_response(status.HTTP_404_NOT_FOUND, "User not found")
-    except UserEnumValueInvalid:
-        return generate_api_error_response(
-            status.HTTP_400_BAD_REQUEST, "Invalid enum value"
-        )
     return user
 
 
@@ -85,7 +90,10 @@ async def update_user(
     status_code=status.HTTP_200_OK,
     response_description="User deleted successfully",
     responses=generate_error_responses(
-        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+        status.HTTP_404_NOT_FOUND,
+        status.HTTP_401_UNAUTHORIZED,
+        status.HTTP_400_BAD_REQUEST,
+        status.HTTP_403_FORBIDDEN,
     ),
     dependencies=[Depends(admin_required)],
 )
