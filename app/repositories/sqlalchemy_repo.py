@@ -4,13 +4,13 @@ from uuid import UUID
 from asyncpg import ForeignKeyViolationError, UniqueViolationError
 from fastapi import Depends
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, StatementError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
 from app.models.base import BaseModel
 from app.repositories.abstract_repo import AbstractRepository
-from app.repositories.errors import EntityNotFound, EntityNotUnique
+from app.repositories.errors import EntityNotFound, EntityNotUnique, EnumValueInvalid
 
 
 class SQLAlchemyRepository(AbstractRepository):
@@ -41,6 +41,9 @@ class SQLAlchemyRepository(AbstractRepository):
         except IntegrityError as e:
             await self.db_session.rollback()
             self._handle_sqlalchemy_error(e)
+        except StatementError as e:
+            await self.db_session.rollback()
+            self._handle_sqlalchemy_error(e)
         return instance
 
     async def list(self, model_cls: BaseModel) -> List[BaseModel]:
@@ -57,6 +60,8 @@ class SQLAlchemyRepository(AbstractRepository):
                 raise EntityNotFound()
             elif isinstance(err.orig.__cause__, UniqueViolationError):
                 raise EntityNotUnique()
+            elif isinstance(err.orig.__cause__, StatementError):
+                raise EnumValueInvalid()
 
     async def ping(self) -> bool:
         if await self.db_session.scalar(select(1)) == 1:
