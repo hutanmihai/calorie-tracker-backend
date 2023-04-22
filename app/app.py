@@ -5,6 +5,7 @@ from uvicorn import run as uvicorn_run
 from app.apis.health_api import router as health_router
 from app.apis.login import router as login_router
 from app.apis.product_api import router as product_router
+from app.apis.user_api import router as user_router
 from app.scripts.create_admin import insert_admin
 from app.settings import settings
 
@@ -14,6 +15,7 @@ def _register_api_handlers(app: FastAPI) -> FastAPI:
     app.include_router(health_router)
     app.include_router(login_router)
     app.include_router(product_router)
+    app.include_router(user_router)
     return app
 
 

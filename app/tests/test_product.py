@@ -18,7 +18,7 @@ from app.tests.utils.data_generation_tools import (
     generate_id,
     get_random_string_of_length_bigger_than_255,
 )
-from app.tests.utils.entity_instance import new_product, new_user
+from app.tests.utils.entity_instance import new_product
 from app.tests.utils.entity_list_instances import get_all_products
 from app.tests.utils.payloads import (
     get_create_product_payload,
@@ -59,7 +59,7 @@ async def test_get_product_with_invalid_id_returns_error(client: AsyncClient):
     )
 
     assert response.status_code == expected_status_code
-    assert_api_error(response.json(), expected_status_code, expected_description)
+    assert_api_error(response.json(), expected_description)
 
 
 @pytest.mark.asyncio
@@ -362,7 +362,7 @@ async def test_update_product_with_not_existing_product_returns_error(
     )
 
     assert response.status_code == expected_status_code
-    assert_api_error(response.json(), expected_status_code, excpected_description)
+    assert_api_error(response.json(), excpected_description)
 
 
 @pytest.mark.asyncio
@@ -396,4 +396,4 @@ async def test_delete_product_with_not_existing_product_returns_error(
     )
 
     assert response.status_code == expected_status_code
-    assert_api_error(response.json(), expected_status_code, excpected_description)
+    assert_api_error(response.json(), excpected_description)

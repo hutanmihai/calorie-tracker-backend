@@ -24,9 +24,7 @@ router = APIRouter(tags=["auth"])
     status_code=status.HTTP_200_OK,
     response_model=TokenSchema,
     response_description="Login successful",
-    responses=generate_error_responses(
-        status.HTTP_400_BAD_REQUEST, status.HTTP_403_FORBIDDEN
-    ),
+    responses=generate_error_responses(status.HTTP_400_BAD_REQUEST),
 )
 async def login_google(token: str, user_srv: UserSrv = Depends(UserSrv)):
     try:
@@ -62,7 +60,15 @@ async def login_google(token: str, user_srv: UserSrv = Depends(UserSrv)):
         return generate_api_error_response(status.HTTP_400_BAD_REQUEST, str(e))
 
 
-@router.get("/protected", summary="Protected endpoint for testing purposes")
+@router.get(
+    "/protected",
+    summary="Protected endpoint for testing purposes",
+    status_code=status.HTTP_200_OK,
+    response_description="Protected endpoint accesed successfully",
+    responses=generate_error_responses(
+        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+    ),
+)
 async def protected_return(
     user_id: UUID = Depends(auth_required), user_srv: UserSrv = Depends(UserSrv)
 ):
@@ -76,6 +82,11 @@ async def protected_return(
 @router.get(
     "/protected-admin",
     summary="Protected endpoint for testing purposes",
+    status_code=status.HTTP_200_OK,
+    response_description="Admin protected endpoint accesed successfully",
+    responses=generate_error_responses(
+        status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN
+    ),
     dependencies=[Depends(admin_required)],
 )
 async def protected_admin():

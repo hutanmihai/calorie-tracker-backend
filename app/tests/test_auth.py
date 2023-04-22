@@ -65,8 +65,8 @@ async def test_valid_jwt_admin_on_user_endpoint_works(client: AsyncClient):
 async def test_user_jwt_cant_access_admin_protected_endpoints(client: AsyncClient):
     new_created_user, jwt = await new_user()
 
-    expected_status_code = status.HTTP_403_FORBIDDEN
-    expected_response = {"detail": "Not an admin user."}
+    expected_status_code = status.HTTP_401_UNAUTHORIZED
+    expected_response = {"detail": "Not an admin user"}
 
     response = await client.get(
         "/protected-admin",
@@ -98,7 +98,7 @@ async def test_invalid_jwt_returns_error(client: AsyncClient):
     new_created_user, jwt = await new_user()
 
     expected_status_code = status.HTTP_403_FORBIDDEN
-    expected_response = {"detail": "Invalid token or expired token."}
+    expected_response = {"detail": "Invalid token"}
 
     response = await client.get(
         "/protected",
@@ -118,7 +118,7 @@ async def test_missing_sub_field_in_jwt_returns_error(client: AsyncClient):
     )
 
     expected_status_code = status.HTTP_403_FORBIDDEN
-    expected_response = {"detail": "Missing user_id in token."}
+    expected_response = {"detail": "Missing user_id in token"}
 
     response = await client.get(
         "/protected",
@@ -135,7 +135,7 @@ async def test_missing_exp_field_in_jwt_returns_error(client: AsyncClient):
     jwt = encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
     expected_status_code = status.HTTP_403_FORBIDDEN
-    expected_response = {"detail": "Missing exp in token."}
+    expected_response = {"detail": "Invalid token"}
 
     response = await client.get(
         "/protected",
@@ -152,7 +152,7 @@ async def test_invalid_sub_in_jwt_returns_error(client: AsyncClient):
     jwt = encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
     expected_status_code = status.HTTP_403_FORBIDDEN
-    expected_response = {"detail": "Invalid user_id in token."}
+    expected_response = {"detail": "Invalid user_id in token"}
 
     response = await client.get(
         "/protected",
@@ -168,8 +168,8 @@ async def test_invalid_jwt_no_user_found_error(client: AsyncClient):
     payload = {"sub": generate_id(), "exp": datetime.utcnow() + timedelta(10)}
     jwt = encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
-    expected_status_code = status.HTTP_403_FORBIDDEN
-    expected_response = {"detail": "User not found."}
+    expected_status_code = status.HTTP_404_NOT_FOUND
+    expected_response = {"detail": "User not found, invalid token"}
 
     response = await client.get(
         "/protected",
@@ -186,7 +186,7 @@ async def test_expired_jwt_returns_error(client: AsyncClient):
     jwt = {"sub": new_created_user.id, "exp": datetime.utcnow() - timedelta(minutes=10)}
 
     expected_status_code = status.HTTP_403_FORBIDDEN
-    expected_response = {"detail": "Invalid token or expired token."}
+    expected_response = {"detail": "Invalid token"}
 
     response = await client.get(
         "/protected",

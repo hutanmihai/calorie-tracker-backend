@@ -22,7 +22,7 @@ class JWTBearer(HTTPBearer):
             if not self.verify_jwt(credentials.credentials):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Invalid token or expired token.",
+                    detail="Invalid token",
                 )
             return credentials.credentials
 
@@ -42,13 +42,17 @@ class JWTBearer(HTTPBearer):
             if not exp:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Missing exp in token.",
+                    detail="Invalid token",
                 )
 
             is_expired = datetime.utcnow() > datetime.utcfromtimestamp(exp)
+            if is_expired:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Expired token",
+                )
 
-            if not is_expired:
-                is_token_valid = True
+            is_token_valid = True
 
         return is_token_valid
 
@@ -58,21 +62,22 @@ async def auth_required(token: str = Depends(JWTBearer())):
     user_id = token_decode(token).get("sub")
     if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Missing user_id in token."
+            status_code=status.HTTP_403_FORBIDDEN, detail="Missing user_id in token"
         )
 
     try:
         user_id = UUID(user_id)
     except ValueError:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid user_id in token."
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid user_id in token"
         )
 
     async with async_session() as session:
         user = await session.get(User, user_id)
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="User not found."
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found, invalid token",
             )
 
     return user_id
@@ -84,12 +89,12 @@ async def admin_required(token: str = Depends(JWTBearer())):
 
     if not admin_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Missing sub in token."
+            status_code=status.HTTP_403_FORBIDDEN, detail="Missing admin_id in token"
         )
 
     if admin_id != settings.admin_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Not an admin user."
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not an admin user"
         )
 
     return admin_id

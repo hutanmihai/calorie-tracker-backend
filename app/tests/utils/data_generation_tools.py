@@ -3,6 +3,7 @@ from random import randint, random
 from string import ascii_lowercase
 from uuid import uuid4
 
+from app.apis.utils.enums import HeightMetric, WeightMetric
 from app.models import Product, User
 
 
@@ -62,4 +63,10 @@ def get_user_instance():
     user.email = get_random_email()
     user.name = get_random_name()
     user.picture = None
+    user.pref_height_metric = HeightMetric.cm if random() < 0.5 else HeightMetric.feet
+    user.height = get_random_float()
+    user.pref_weight_metric = WeightMetric.kg if random() < 0.5 else WeightMetric.lbs
+    user.weight = get_random_float()
+    user.target_weight = get_random_float()
+    user.target_calories = get_random_int()
     return user
