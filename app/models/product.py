@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import FLOAT, INT, VARCHAR, Column
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from app.models.base import BaseModel
 
@@ -17,3 +18,6 @@ class Product(BaseModel):
     protein = Column(FLOAT(precision=None, decimal_return_scale=2), nullable=False)
     upvotes = Column(INT(), nullable=False)
     downvotes = Column(INT(), nullable=False)
+    meal_products = relationship(
+        "MealProduct", back_populates="product", cascade="all, delete"
+    )
