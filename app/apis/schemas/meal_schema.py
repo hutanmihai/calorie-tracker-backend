@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import UUID4, BaseModel, Field, validator
+from pydantic import UUID4, BaseModel, Field
 
 from app.apis.schemas.base_schema import EntityID
 from app.apis.schemas.product_schema import ProductBase
@@ -8,16 +8,6 @@ from app.apis.schemas.product_schema import ProductBase
 
 class ProductMealBase(ProductBase):
     quantity_grams: float = Field(..., gt=0)
-
-    # TODO FIX THIS
-    @validator(
-        "calories", "fat", "carbs", "protein", pre=True, always=True, allow_reuse=True
-    )
-    def calculate_nutrients(cls, v, values):
-        quantity_grams = values.get("quantity_grams")
-        if v is not None and quantity_grams is not None:
-            v = round((v / 100) * quantity_grams, 2)
-        return v
 
 
 class ProductMeal(BaseModel):
