@@ -8,3 +8,7 @@ class EntityNotUnique(BaseRepositoryError):
 
 class EntityNotFound(BaseRepositoryError):
     """Raised when a resource is not found."""
+
+
+class EntityAlreadyExists(BaseRepositoryError):
+    """Raised when a resource already exists."""

@@ -28,3 +28,15 @@ class BaseMealServiceError(BaseServiceError):
 
 class MealNotFound(BaseMealServiceError):
     """Raised when a meal doesn't exist."""
+
+
+class BaseDiaryServiceError(BaseServiceError):
+    """Base class for all exceptions raise by Diary services"""
+
+
+class DiaryNotFound(BaseDiaryServiceError):
+    """Raised when a diary doesn't exist."""
+
+
+class DiaryAlreadyExists(BaseDiaryServiceError):
+    """Raised when a diary already exists."""
