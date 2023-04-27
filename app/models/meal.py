@@ -31,7 +31,7 @@ class Meal(BaseModel):
     def __init__(self, name: str, user_id: UUID, products: List[Tuple[Product, float]]):
         self.name = name
         self.user_id = user_id
-        self.products = []
+        self.meal_products = []
         self.total_calories = 0
         self.total_protein = 0
         self.total_fat = 0
@@ -41,7 +41,7 @@ class Meal(BaseModel):
             meal_product = MealProduct(
                 meal=self, product=product, quantity_grams=quantity_grams
             )
-            self.products.append(meal_product)
+            self.meal_products.append(meal_product)
             self.total_calories += meal_product.calories
             self.total_protein += meal_product.protein
             self.total_fat += meal_product.fat

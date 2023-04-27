@@ -20,3 +20,11 @@ class BaseProductServiceError(BaseServiceError):
 
 class ProductNotFound(BaseProductServiceError):
     """Raised when a product doesn't exist."""
+
+
+class BaseMealServiceError(BaseServiceError):
+    """Base class for all exceptions raise by Meal services"""
+
+
+class MealNotFound(BaseMealServiceError):
+    """Raised when a meal doesn't exist."""
