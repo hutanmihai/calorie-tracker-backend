@@ -21,3 +21,6 @@ class Product(BaseModel):
     meal_products = relationship(
         "MealProduct", back_populates="product", cascade="all, delete"
     )
+    diary_products = relationship(
+        "DiaryProduct", back_populates="product", cascade="all, delete"
+    )

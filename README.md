@@ -3,7 +3,10 @@
 Calorie Tracker Backend is a simple REST service which allows CRUD methods to operate on the data in our database.
 It provides a set of APIs for:
 
-- @TODO
+- User management
+- Product management
+- Meal management
+- Diary management
 
 # Hutan Mihai-Alexandru -- Contact
 
