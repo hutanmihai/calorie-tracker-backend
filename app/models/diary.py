@@ -63,7 +63,6 @@ class Diary(BaseModel):
         diary_product = DiaryProduct(
             diary=self, product=product, quantity_grams=quantity_grams
         )
-        self.diary_products.append(diary_product)
         self.total_calories += diary_product.calories
         self.total_protein += diary_product.protein
         self.total_fat += diary_product.fat

@@ -51,3 +51,57 @@ class Meal(BaseModel):
         self.total_protein = round(self.total_protein, 2)
         self.total_fat = round(self.total_fat, 2)
         self.total_carbs = round(self.total_carbs, 2)
+
+    def add_meal_product(self, product: Product, quantity_grams: float):
+        meal_product = MealProduct(
+            meal=self, product=product, quantity_grams=quantity_grams
+        )
+        self.total_calories += meal_product.calories
+        self.total_protein += meal_product.protein
+        self.total_fat += meal_product.fat
+        self.total_carbs += meal_product.carbs
+
+        self.total_calories = round(self.total_calories, 2)
+        self.total_protein = round(self.total_protein, 2)
+        self.total_fat = round(self.total_fat, 2)
+        self.total_carbs = round(self.total_carbs, 2)
+
+    async def delete_meal_product(self, product: Product, session):
+        for meal_product in self.meal_products:
+            if meal_product.product_id == product.id:
+                self.total_calories -= meal_product.calories
+                self.total_protein -= meal_product.protein
+                self.total_fat -= meal_product.fat
+                self.total_carbs -= meal_product.carbs
+
+                self.meal_products.remove(meal_product)
+
+                self.total_calories = round(self.total_calories, 2)
+                self.total_protein = round(self.total_protein, 2)
+                self.total_fat = round(self.total_fat, 2)
+                self.total_carbs = round(self.total_carbs, 2)
+
+                await session.delete(meal_product)
+
+                break
+
+    def update_meal_product(self, product: Product, quantity_grams: float):
+        for meal_product in self.meal_products:
+            if meal_product.product_id == product.id:
+                self.total_calories -= meal_product.calories
+                self.total_protein -= meal_product.protein
+                self.total_fat -= meal_product.fat
+                self.total_carbs -= meal_product.carbs
+
+                meal_product.quantity_grams = quantity_grams
+
+                self.total_calories += meal_product.calories
+                self.total_protein += meal_product.protein
+                self.total_fat += meal_product.fat
+                self.total_carbs += meal_product.carbs
+
+                self.total_calories = round(self.total_calories, 2)
+                self.total_protein = round(self.total_protein, 2)
+                self.total_fat = round(self.total_fat, 2)
+                self.total_carbs = round(self.total_carbs, 2)
+                break
