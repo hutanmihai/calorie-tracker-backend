@@ -48,29 +48,18 @@ class MealSrv(AbstractService):
             raise MealNotFound()
         if name:
             instance.name = name
-        # It means we want to delete the product
+        # If quantity_grams is None it means we want to delete the product from the meal
         if product_id and not quantity_grams:
-            instance.meal_products = [
-                meal_product
-                for meal_product in instance.meal_products
-                if meal_product.product_id != product_id
-            ]
+            await instance.delete_meal_product(product, self._repository.db_session)
+
         # If the product is already in the meal, update the quantity
-        if product_id in [
-            meal_product.product_id for meal_product in instance.meal_products
+        elif product in [
+            meal_product.product for meal_product in instance.meal_products
         ]:
-            for meal_product in instance.meal_products:
-                if meal_product.product_id == product_id:
-                    meal_product.quantity_grams = quantity_grams
+            instance.update_meal_product(product, quantity_grams)
 
         # If the product is not in the meal, add it
         else:
-            instance.meal_products.append(
-                MealProduct(
-                    id=uuid4(),
-                    meal_id=meal_id,
-                    product_id=product_id,
-                    quantity_grams=quantity_grams,
-                )
-            )
+            instance.add_meal_product(product, quantity_grams)
+
         return await self._repository.update(instance)

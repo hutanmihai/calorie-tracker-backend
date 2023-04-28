@@ -12,11 +12,37 @@ from app.apis.schemas.meal_schema import (
 )
 from app.apis.utils.utils import generate_api_error_response, generate_error_responses
 from app.auth.auth_bearer import auth_required
+from app.models import Meal
 from app.services.errors import MealNotFound, ProductNotFound
 from app.services.meal_srv import MealSrv
 from app.services.product_srv import ProductSrv
 
 router = APIRouter(tags=["meal"])
+
+
+def generate_response(meal: Meal) -> MealBase:
+    return MealBase(
+        id=meal.id,
+        name=meal.name,
+        total_calories=meal.total_calories,
+        total_fat=meal.total_fat,
+        total_carbs=meal.total_carbs,
+        total_protein=meal.total_protein,
+        products=[
+            ProductMealBase(
+                id=meal_product.product.id,
+                name=meal_product.product.name,
+                calories=meal_product.calories,
+                fat=meal_product.fat,
+                carbs=meal_product.carbs,
+                protein=meal_product.protein,
+                upvotes=meal_product.product.upvotes,
+                downvotes=meal_product.product.downvotes,
+                quantity_grams=meal_product.quantity_grams,
+            )
+            for meal_product in meal.meal_products
+        ],
+    )
 
 
 @router.post(
@@ -91,31 +117,7 @@ async def list_meals(
     user_id: UUID = Depends(auth_required), meal_srv: MealSrv = Depends(MealSrv)
 ) -> List[MealBase] | JSONResponse:
     meals = await meal_srv.list_meals(user_id)
-    return [
-        MealBase(
-            id=meal.id,
-            name=meal.name,
-            total_calories=meal.total_calories,
-            total_fat=meal.total_fat,
-            total_carbs=meal.total_carbs,
-            total_protein=meal.total_protein,
-            products=[
-                ProductMealBase(
-                    id=meal_product.product.id,
-                    name=meal_product.product.name,
-                    calories=meal_product.calories,
-                    fat=meal_product.fat,
-                    carbs=meal_product.carbs,
-                    protein=meal_product.protein,
-                    upvotes=meal_product.product.upvotes,
-                    downvotes=meal_product.product.downvotes,
-                    quantity_grams=meal_product.quantity_grams,
-                )
-                for meal_product in meal.meal_products
-            ],
-        )
-        for meal in meals
-    ]
+    return [generate_response(meal) for meal in meals]
 
 
 @router.get(
@@ -137,28 +139,7 @@ async def get_meal(
         meal = await meal_srv.get_meal(user_id, meal_id)
     except MealNotFound:
         return generate_api_error_response(status.HTTP_404_NOT_FOUND, "Meal not found")
-    return MealBase(
-        id=meal.id,
-        name=meal.name,
-        total_calories=meal.total_calories,
-        total_fat=meal.total_fat,
-        total_carbs=meal.total_carbs,
-        total_protein=meal.total_protein,
-        products=[
-            ProductMealBase(
-                id=meal_product.product.id,
-                name=meal_product.product.name,
-                calories=meal_product.calories,
-                fat=meal_product.fat,
-                carbs=meal_product.carbs,
-                protein=meal_product.protein,
-                upvotes=meal_product.product.upvotes,
-                downvotes=meal_product.product.downvotes,
-                quantity_grams=meal_product.quantity_grams,
-            )
-            for meal_product in meal.meal_products
-        ],
-    )
+    return generate_response(meal)
 
 
 @router.delete(
@@ -219,25 +200,4 @@ async def update_meal(
         )
     except MealNotFound:
         return generate_api_error_response(status.HTTP_404_NOT_FOUND, "Meal not found")
-    return MealBase(
-        id=meal.id,
-        name=meal.name,
-        total_calories=meal.total_calories,
-        total_fat=meal.total_fat,
-        total_carbs=meal.total_carbs,
-        total_protein=meal.total_protein,
-        products=[
-            ProductMealBase(
-                id=meal_product.product.id,
-                name=meal_product.product.name,
-                calories=meal_product.calories,
-                fat=meal_product.fat,
-                carbs=meal_product.carbs,
-                protein=meal_product.protein,
-                upvotes=meal_product.product.upvotes,
-                downvotes=meal_product.product.downvotes,
-                quantity_grams=meal_product.quantity_grams,
-            )
-            for meal_product in meal.meal_products
-        ],
-    )
+    return generate_response(meal)
