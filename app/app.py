@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run as uvicorn_run
 
+from app.apis.diary_api import router as diary_router
 from app.apis.health_api import router as health_router
 from app.apis.login import router as login_router
 from app.apis.meal_api import router as meal_router
@@ -18,6 +19,7 @@ def _register_api_handlers(app: FastAPI) -> FastAPI:
     app.include_router(product_router)
     app.include_router(user_router)
     app.include_router(meal_router)
+    app.include_router(diary_router)
     return app
 
 
