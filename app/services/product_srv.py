@@ -74,3 +74,6 @@ class ProductSrv(AbstractService):
         except EntityNotFound:
             raise ProductNotFound()
         return await self._repository.delete(instance)
+
+    async def search_product(self, product_string):
+        return await self._repository.search_product(product_string)
