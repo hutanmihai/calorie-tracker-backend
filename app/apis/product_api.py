@@ -139,3 +139,21 @@ async def delete_product(
         status_code=status.HTTP_200_OK,
         content={"message": "Product deleted successfully"},
     )
+
+
+@router.get(
+    "/product/search/{product_string}",
+    summary="Get product by string",
+    status_code=status.HTTP_200_OK,
+    response_model=ProductsList,
+    response_description="Product updated successfully",
+    responses=generate_error_responses(
+        status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN
+    ),
+    dependencies=[Depends(auth_required)],
+)
+async def get_product_by_string(
+    product_string: str, product_srv: ProductSrv = Depends(ProductSrv)
+) -> ProductsList:
+    products = await product_srv.search_product(product_string)
+    return ProductsList(products=[product for product in products])
