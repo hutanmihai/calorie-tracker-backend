@@ -13,6 +13,10 @@ It provides a set of APIs for:
 - Personal email: hutanmihai29@gmail.com
 - LinkedIn: https://www.linkedin.com/in/hutanmihai/
 - Personal GitHub: https://github.com/hutanmihai
+- Portfolio: https://mihaihutan.ro
+
+## Frontend App
+You can see how the app looks in the readme of the frontend repository [here](https://github.com/RaduBesliu/calorie-tracker-mobile).
 
 ## Development
 
@@ -64,14 +68,6 @@ It provides a set of APIs for:
 - [Lesson 4](https://www.youtube.com/watch?v=58jGpV2Cg50&t=4881s)
 
 ### Development methodology
-
-### Team, responsibility and roles
-
-| Name           | Email                                | Responsibility | Scrum Role |
-|----------------|--------------------------------------|----------------|------------|
-| Hutan Mihai    | mihai-alexandru.hutan@s.unibuc.ro    | Tech Lead      | Dev        |
-| Besliu Radu    | radu-stefan.besliu@s.unibuc.ro       | PM             | SM, PO     |
-| Florea Madalin | madalin-alexandru.florea@s.unibuc.ro | Team Lead      | Dev        |
 
 ### How to start working on a feature
 
